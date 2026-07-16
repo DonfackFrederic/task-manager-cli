@@ -1,0 +1,22 @@
+# Build
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Données générées à l'exécution
+data/tasks.json
+
+# Logs (bonus Sprint 5)
+logs/
+*.log
