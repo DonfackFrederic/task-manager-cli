@@ -2,6 +2,7 @@ package com.frederic.taskmanager.repository;
 
 import com.frederic.taskmanager.model.Task;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface TaskRepository {
 
-    List<Task> findAll();
+    LinkedHashMap<Integer, Task> findAll();
 
-    void saveAll(List<Task> tasks);
+    void saveAll(LinkedHashMap<Integer, Task> tasks);
 }
