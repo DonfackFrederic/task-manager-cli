@@ -2,6 +2,7 @@ package com.frederic.taskmanager.repository;
 
 import com.frederic.taskmanager.model.Task;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -15,12 +16,12 @@ import java.util.List;
 public class JsonTaskRepository implements TaskRepository {
 
     @Override
-    public List<Task> findAll() {
+    public LinkedHashMap<Integer, Task> findAll() {
         throw new UnsupportedOperationException("TODO Sprint 2");
     }
 
     @Override
-    public void saveAll(List<Task> tasks) {
+    public void saveAll(LinkedHashMap<Integer, Task> tasks) {
         throw new UnsupportedOperationException("TODO Sprint 2");
     }
 }
