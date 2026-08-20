@@ -1,7 +1,9 @@
 package com.frederic.taskmanager.repository;
 
+import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public interface TaskRepository {
 
-    LinkedHashMap<Integer, Task> findAll();
+    LinkedHashMap<Integer, Task> findAll() throws TaskRepositoryException;
 
-    void saveAll(LinkedHashMap<Integer, Task> tasks);
+    void saveAll(LinkedHashMap<Integer, Task> tasks) throws TaskRepositoryException;
 }

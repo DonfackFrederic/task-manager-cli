@@ -1,8 +1,10 @@
 package com.frederic.taskmanager.service;
 
 import com.frederic.taskmanager.exception.TaskNotFoundException;
+import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
 import com.frederic.taskmanager.model.TaskStatus;
+import com.frederic.taskmanager.repository.TaskRepository;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -27,24 +29,34 @@ import java.util.*;
  */
 public class TaskService {
     // TODO Sprint 1 / Sprint 2
-    private final LinkedHashMap<Integer, Task> tasks = new LinkedHashMap<>();
-    public void addTask(Task task) {
-        tasks.put(task.getId(), task);
+    private final LinkedHashMap<Integer, Task> tasks;
+    private final TaskRepository jsonTaskRepository;
+
+    public TaskService(TaskRepository jsonTaskRepository) throws TaskRepositoryException {
+        this.jsonTaskRepository = jsonTaskRepository;
+        tasks = jsonTaskRepository.findAll();
     }
 
-    public void deleteTask(int id) {
+    public void addTask(Task task) throws TaskRepositoryException {
+        tasks.put(task.getId(), task);
+        jsonTaskRepository.saveAll(tasks);
+    }
+
+    public void deleteTask(int id) throws TaskRepositoryException {
         Task result = tasks.remove(id);
         if (result == null) {
             throw new TaskNotFoundException("Task with id " + id + " not found");
         }
+        this.jsonTaskRepository.saveAll(tasks);
     }
 
-    public void markAsDone(int id) {
+    public void markAsDone(int id) throws TaskRepositoryException {
         Task task = tasks.get(id);
         if (task == null) {
             throw new TaskNotFoundException("Task not found with id " + id);
         }
         task.setStatus(TaskStatus.DONE);
+        jsonTaskRepository.saveAll(tasks);
     }
 
     public String listTasks() {
