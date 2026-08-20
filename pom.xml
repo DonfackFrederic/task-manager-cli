@@ -19,11 +19,25 @@
 
         <junit.version>5.10.2</junit.version>
         <gson.version>2.11.0</gson.version>
-        <mockito.version>5.12.0</mockito.version>
+        <mockito.version>5.23.0</mockito.version>
+        <tools.jackson.version>3.2.1</tools.jackson.version>
+        <ascii.table.version>1.8.0</ascii.table.version>
 
         <!-- Classe principale, utilisée par maven-jar-plugin -->
         <main.class>com.frederic.taskmanager.App</main.class>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${tools.jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>   
 
     <dependencies>
         <!-- JUnit 5 -->
@@ -41,19 +55,26 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- Gson, pour la persistance JSON (Sprint 2) -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- Freva, pour l'affichage en tableau -->
+        <!-- Jackson, pour la persistance JSON (Sprint 2) -->
+        <!-- Data-binding (inclut automatiquement core et annotations) -->
+        <!-- Jackson 3, pour la persistance JSON -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- ascii-table, pour l'affichage en tableau -->
         <dependency>
             <groupId>com.github.freva</groupId>
             <artifactId>ascii-table</artifactId>
-            <version>1.8.0</version>
+            <version>${ascii.table.version}</version>
         </dependency>
     </dependencies>
 
@@ -113,6 +134,26 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                </configuration>
             </plugin>
 
             <!-- Couverture de tests (activé pleinement au Sprint 4, mais présent dès maintenant) -->

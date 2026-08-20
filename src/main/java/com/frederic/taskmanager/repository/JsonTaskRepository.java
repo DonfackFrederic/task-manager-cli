@@ -1,9 +1,17 @@
 package com.frederic.taskmanager.repository;
 
+import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * Implémentation JSON de {@link TaskRepository} (via Gson).
@@ -14,14 +22,52 @@ import java.util.List;
  *  - Gérer les erreurs de lecture/écriture
  */
 public class JsonTaskRepository implements TaskRepository {
+    private final Path filePath;
+
+    private final ObjectMapper objectMapper;
+
+    public JsonTaskRepository(Path filePath) {
+        this.filePath = filePath;
+    }
+    public JsonTaskRepository() {
+        this.filePath = Paths.get("task.json");
+    }
+
+    {
+        objectMapper = JsonMapper.builder().build();
+    }
+
 
     @Override
-    public LinkedHashMap<Integer, Task> findAll() {
-        throw new UnsupportedOperationException("TODO Sprint 2");
+    public LinkedHashMap<Integer, Task> findAll() throws TaskRepositoryException{
+        if (!Files.exists(filePath)) {
+            return new LinkedHashMap<>();
+        }
+
+        try {
+            if (Files.size(filePath) == 0) {
+                return new LinkedHashMap<>();
+            }
+
+            LinkedHashMap<Integer, Task> tasks = objectMapper.readValue(
+                    filePath.toFile(),
+                    new TypeReference<LinkedHashMap<Integer, Task>>() {}
+            );
+
+            return tasks != null
+                    ? tasks
+                    : new LinkedHashMap<>();
+
+        } catch (JacksonException | IOException e) {
+            throw new TaskRepositoryException(
+                    "Unable to read " + filePath,
+                    e
+            );
+        }
     }
 
     @Override
-    public void saveAll(LinkedHashMap<Integer, Task> tasks) {
-        throw new UnsupportedOperationException("TODO Sprint 2");
+    public void saveAll(LinkedHashMap<Integer, Task> tasks){
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), tasks);
     }
 }

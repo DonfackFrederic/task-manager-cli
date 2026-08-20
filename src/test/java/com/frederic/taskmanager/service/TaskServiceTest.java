@@ -1,35 +1,56 @@
 package com.frederic.taskmanager.service;
 
 import com.frederic.taskmanager.exception.TaskNotFoundException;
+import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
 import com.frederic.taskmanager.model.TaskStatus;
+import com.frederic.taskmanager.repository.TaskRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
+
+    private TaskService taskService;
+
+    @Mock
+    private TaskRepository taskRepository;
+
+    @BeforeEach
+    void setUp() throws TaskRepositoryException {
+        when(taskRepository.findAll())
+                .thenReturn(new LinkedHashMap<>());
+        this.taskService = new TaskService(taskRepository);
+    }
+
 
     /* Ajout d'une tache : cas normal */
     @Test
-    void shouldAddTask() {
-        TaskService taskService = new TaskService();
+    void shouldAddTask() throws TaskRepositoryException {
 
-        Task task = new Task(
-                10,
-                "Faire les courses",
-                TaskStatus.TODO
-        );
+        Task task = new Task(10, "Faire les courses", TaskStatus.TODO);
 
         taskService.addTask(task);
         assertEquals(1, taskService.getTaskCount());
 
         String result = taskService.listTasks();
         assertTrue(result.contains("Faire les courses"));
+
+        verify(taskRepository).saveAll(any(LinkedHashMap.class));
     }
 
     @Test
-    void shouldReplaceTask() {
-        TaskService taskService = new TaskService();
+    void shouldReplaceTask() throws TaskRepositoryException {
         Task task1 = new Task(10, "Faire les courses", TaskStatus.TODO);
         Task task2 = new Task(10, "Reviser pour les examens", TaskStatus.TODO);
         taskService.addTask(task1);
@@ -41,8 +62,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldDeleteTask() {
-        TaskService taskService = new TaskService();
+    void shouldDeleteTask() throws TaskRepositoryException {
         Task task1 = new Task(10, "Faire les courses", TaskStatus.TODO);
         Task task2 = new Task(11, "Reviser pour les examens", TaskStatus.TODO);
         taskService.addTask(task1);
@@ -56,17 +76,14 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenDeleteTask() {
-        TaskService taskService = new TaskService();
-        Task task = new Task(10, "Faire les courses", TaskStatus.TODO);
-        taskService.addTask(task);
-
+    void shouldThrowExceptionWhenDeleteTask() throws TaskRepositoryException {
         assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(11));
+
+        verify(taskRepository, never()).saveAll(any());
     }
 
     @Test
-    void shouldMarkAsDone() {
-        TaskService taskService = new TaskService();
+    void shouldMarkAsDone() throws TaskRepositoryException {
         Task task = new Task(10, "Faire les courses", TaskStatus.TODO);
         taskService.addTask(task);
         taskService.markAsDone(task.getId());
@@ -75,8 +92,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenMarkAsDone() {
-        TaskService taskService = new TaskService();
+    void shouldThrowExceptionWhenMarkAsDone() throws TaskRepositoryException {
         Task task = new Task(10, "Faire les courses", TaskStatus.TODO);
         taskService.addTask(task);
 
@@ -84,8 +100,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldListTasks() {
-        TaskService taskService = new TaskService();
+    void shouldListTasks() throws TaskRepositoryException {
         Task task1 = new Task(10, "Faire les courses", TaskStatus.TODO);
         taskService.addTask(task1);
 
@@ -102,8 +117,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldGetTaskCount() {
-        TaskService taskService = new TaskService();
+    void shouldGetTaskCount() throws TaskRepositoryException {
         Task task1 = new Task(10, "Faire les courses", TaskStatus.TODO);
         Task task2 = new Task(11, "Reviser pour les examens", TaskStatus.TODO);
         taskService.addTask(task1);
@@ -116,5 +130,53 @@ class TaskServiceTest {
 
         assertNotEquals(3, taskService.getTaskCount());
         assertEquals(2, taskService.getTaskCount());
+    }
+
+    @Test
+    void shouldLoadTasksWhenServiceIsCreated()
+            throws TaskRepositoryException {
+
+        verify(taskRepository).findAll();
+    }
+
+    @Test
+    void shouldThrowWhenRepositoryCannotRead() throws TaskRepositoryException {
+
+        TaskRepositoryException exception =
+                new TaskRepositoryException(
+                        "Impossible de lire le fichier",
+                        new IOException("Permission denied")
+                );
+
+        when(taskRepository.findAll())
+                .thenThrow(exception);
+
+        assertThrows(
+                TaskRepositoryException.class,
+                () -> new TaskService(taskRepository)
+        );
+    }
+
+    @Test
+    void shouldPropagateRepositoryErrorWhenSaving()
+            throws TaskRepositoryException {
+
+        doThrow(
+                new TaskRepositoryException(
+                        "Impossible d'écrire le fichier",
+                        new IOException("Permission denied")
+                )
+        ).when(taskRepository).saveAll(any());
+
+        Task task = new Task(
+                10,
+                "Faire les courses",
+                TaskStatus.TODO
+        );
+
+        assertThrows(
+                TaskRepositoryException.class,
+                () -> taskService.addTask(task)
+        );
     }
 }

@@ -1,5 +1,8 @@
 package com.frederic.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 /**
@@ -19,10 +22,20 @@ public class Task {
     private final LocalDateTime createdAt;
 
     public Task(int id, String title, TaskStatus status) {
+        this(id, title, status, LocalDateTime.now());
+    }
+
+    @JsonCreator
+    public Task(
+            @JsonProperty("id") int id,
+            @JsonProperty("title") String title,
+            @JsonProperty("status") TaskStatus status,
+            @JsonProperty("createdAt") LocalDateTime createdAt
+    ) {
         this.id = id;
         this.title = title;
         this.status = status;
-        this.createdAt =  LocalDateTime.now();
+        this.createdAt = createdAt;
     }
 
     public int getId() { return id; }
