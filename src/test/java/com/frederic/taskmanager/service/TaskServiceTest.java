@@ -43,7 +43,7 @@ class TaskServiceTest {
         taskService.addTask(task);
         assertEquals(1, taskService.getTaskCount());
 
-        String result = taskService.listTasks();
+        String result = taskService.listTasks().toString();
         assertTrue(result.contains("Faire les courses"));
 
         verify(taskRepository).saveAll(any(LinkedHashMap.class));
@@ -57,7 +57,7 @@ class TaskServiceTest {
         taskService.addTask(task2);
 
         assertEquals(1, taskService.getTaskCount()); // plusieurs ajouts sur un même id provoquent un remplacement
-        String result = taskService.listTasks();
+        String result = taskService.listTasks().toString();
         assertFalse(result.contains("Faire les courses"));
     }
 
@@ -71,7 +71,7 @@ class TaskServiceTest {
         taskService.deleteTask(task1.getId());
 
         assertEquals(1, taskService.getTaskCount());
-        String result = taskService.listTasks();
+        String result = taskService.listTasks().toString();
         assertFalse(result.contains("Faire les courses"));
     }
 
@@ -100,16 +100,11 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldListTasks() throws TaskRepositoryException {
+    void shouldGetTasks() throws TaskRepositoryException {
         Task task1 = new Task(10, "Faire les courses", TaskStatus.TODO);
         taskService.addTask(task1);
 
-        String result = taskService.listTasks();
-        // check titles
-        assertTrue(result.contains("ID"));
-        assertTrue(result.contains("Titre"));
-        assertTrue(result.contains("Créée le"));
-        assertTrue(result.contains("Statut"));
+        String result = taskService.listTasks().toString();
 
         assertTrue(result.contains("10"));
         assertTrue(result.contains("Faire les courses"));

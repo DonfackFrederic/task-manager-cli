@@ -9,7 +9,7 @@ public class IdGeneratorService {
         StringBuilder sb = new StringBuilder(5);
 
         for (int i = 0; i < 5; i++) {
-            sb.append(RANDOM.nextInt(10));
+            sb.append(RANDOM.nextInt(1,10));
         }
 
         return Integer.parseInt(sb.toString());

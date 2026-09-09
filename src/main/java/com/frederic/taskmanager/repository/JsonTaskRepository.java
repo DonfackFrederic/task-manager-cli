@@ -28,12 +28,6 @@ public class JsonTaskRepository implements TaskRepository {
 
     public JsonTaskRepository(Path filePath) {
         this.filePath = filePath;
-    }
-    public JsonTaskRepository() {
-        this.filePath = Paths.get("task.json");
-    }
-
-    {
         objectMapper = JsonMapper.builder().build();
     }
 
@@ -67,7 +61,16 @@ public class JsonTaskRepository implements TaskRepository {
     }
 
     @Override
-    public void saveAll(LinkedHashMap<Integer, Task> tasks){
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), tasks);
+    public void saveAll(LinkedHashMap<Integer, Task> tasks) throws TaskRepositoryException {
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), tasks);
+        } catch (JacksonException e) {
+            throw new TaskRepositoryException("Unable to write " + filePath, e);
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        return Files.exists(filePath);
     }
 }

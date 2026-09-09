@@ -3,7 +3,6 @@ package com.frederic.taskmanager.repository;
 import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
 import com.frederic.taskmanager.model.TaskStatus;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -11,9 +10,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class JsonTaskRepositoryTest {
 
@@ -42,7 +41,7 @@ class JsonTaskRepositoryTest {
     }
 
     @Test
-    void shouldSaveTask() throws IOException {
+    void shouldSaveTask() throws IOException, TaskRepositoryException {
         Path path = tempDir.resolve("task.json");
 
         JsonTaskRepository repository = new JsonTaskRepository(path);
@@ -107,5 +106,33 @@ class JsonTaskRepositoryTest {
         JsonTaskRepository repository = new JsonTaskRepository(file);
 
         assertThrows(TaskRepositoryException.class, repository::findAll);
+    }
+
+    @Test
+    void shouldReturnFalseWhenFileDoesNotExist() {
+
+        Path file = tempDir.resolve("task.json");
+
+        JsonTaskRepository repository =
+                new JsonTaskRepository(file);
+
+        boolean result = repository.exists();
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnTrueWhenFileExists() throws IOException {
+
+        Path file = tempDir.resolve("task.json");
+
+        Files.createFile(file);
+
+        JsonTaskRepository repository =
+                new JsonTaskRepository(file);
+
+        boolean result = repository.exists();
+
+        assertTrue(result);
     }
 }
