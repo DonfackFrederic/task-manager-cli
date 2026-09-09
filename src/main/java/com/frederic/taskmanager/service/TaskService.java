@@ -37,6 +37,11 @@ public class TaskService {
         tasks = jsonTaskRepository.findAll();
     }
 
+    public TaskService(TaskRepository jsonTaskRepository, LinkedHashMap<Integer, Task> initialTasks) {
+        this.jsonTaskRepository = jsonTaskRepository;
+        this.tasks = initialTasks;
+    }
+
     public void addTask(Task task) throws TaskRepositoryException {
         tasks.put(task.getId(), task);
         jsonTaskRepository.saveAll(tasks);
@@ -59,13 +64,8 @@ public class TaskService {
         jsonTaskRepository.saveAll(tasks);
     }
 
-    public String listTasks() {
-        return AsciiTable.getTable(tasks.values(), Arrays.asList(
-                new Column().header("ID").with(task -> String.valueOf(task.getId())),
-                new Column().header("Titre").maxWidth(30).with(Task::getTitle),
-                new Column().header("Statut").dataAlign(HorizontalAlign.CENTER).with(t -> t.getStatus().toString()),
-                new Column().header("Créée le").with(task -> task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-        ));
+    public List<Task> listTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
     public int getTaskCount() {

@@ -20,4 +20,6 @@ public interface TaskRepository {
     LinkedHashMap<Integer, Task> findAll() throws TaskRepositoryException;
 
     void saveAll(LinkedHashMap<Integer, Task> tasks) throws TaskRepositoryException;
+
+    boolean exists() throws TaskRepositoryException;
 }
