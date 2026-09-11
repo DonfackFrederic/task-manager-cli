@@ -6,11 +6,11 @@ Gestionnaire de tâches en ligne de commande, écrit en Java (projet pédagogiqu
 
 ## Fonctionnalités
 
-- [ ] Ajouter une tâche
-- [ ] Supprimer une tâche
-- [ ] Marquer une tâche comme terminée
-- [ ] Lister les tâches
-- [ ] Sauvegarder / charger les tâches (JSON)
+- [x] Ajouter une tâche
+- [x] Supprimer une tâche
+- [x] Marquer une tâche comme terminée
+- [x] Lister les tâches
+- [x] Sauvegarder / charger les tâches (JSON)
 
 ## Prérequis
 
@@ -47,6 +47,13 @@ mvn test
 mvn test jacoco:report
 # rapport généré dans target/site/jacoco/index.html
 ```
+
+## Logs
+
+Les logs applicatifs sont gérés par Log4j2 :
+- Niveau INFO et supérieur affiché en console pendant l'exécution
+- Historique complet conservé dans `logs/app.log` (non versionné, voir `.gitignore`)
+- Rotation automatique : nouveau fichier par jour ou au-delà de 5 Mo, 7 fichiers conservés
 
 ## Architecture
 
