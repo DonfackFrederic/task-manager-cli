@@ -5,11 +5,6 @@ import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
 import com.frederic.taskmanager.model.TaskStatus;
 import com.frederic.taskmanager.repository.TaskRepository;
-import com.github.freva.asciitable.AsciiTable;
-import com.github.freva.asciitable.Column;
-import com.github.freva.asciitable.HorizontalAlign;
-
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
