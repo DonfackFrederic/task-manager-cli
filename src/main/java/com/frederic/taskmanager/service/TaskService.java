@@ -27,14 +27,21 @@ import java.util.*;
  *
  * TODO (Sprint 2) : injecter un TaskRepository par constructeur.
  */
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class TaskService {
     // TODO Sprint 1 / Sprint 2
+    private static final Logger logger = LogManager.getLogger(TaskService.class);
+
     private final LinkedHashMap<Integer, Task> tasks;
     private final TaskRepository jsonTaskRepository;
 
     public TaskService(TaskRepository jsonTaskRepository) throws TaskRepositoryException {
         this.jsonTaskRepository = jsonTaskRepository;
         tasks = jsonTaskRepository.findAll();
+
+        logger.info("{} tâche(s) chargée(s) en mémoire", tasks.size());
     }
 
     public TaskService(TaskRepository jsonTaskRepository, LinkedHashMap<Integer, Task> initialTasks) {
@@ -45,6 +52,8 @@ public class TaskService {
     public void addTask(Task task) throws TaskRepositoryException {
         tasks.put(task.getId(), task);
         jsonTaskRepository.saveAll(tasks);
+
+        logger.info("Tâche #{} ajoutée - {} tâche(s) en mémoire", task.getId(), tasks.size());
     }
 
     public void deleteTask(int id) throws TaskRepositoryException {
@@ -53,6 +62,8 @@ public class TaskService {
             throw new TaskNotFoundException("Task with id " + id + " not found");
         }
         this.jsonTaskRepository.saveAll(tasks);
+
+        logger.info("Tâche #{} supprimée - {} tâche(s) restante(s)", id, tasks.size());
     }
 
     public void markAsDone(int id) throws TaskRepositoryException {
@@ -62,6 +73,8 @@ public class TaskService {
         }
         task.setStatus(TaskStatus.DONE);
         jsonTaskRepository.saveAll(tasks);
+
+        logger.info("Tâche #{} marquée comme terminée", id);
     }
 
     public List<Task> listTasks() {
