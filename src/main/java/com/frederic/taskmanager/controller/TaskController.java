@@ -8,6 +8,10 @@ import com.frederic.taskmanager.service.IdGeneratorService;
 import com.frederic.taskmanager.service.TaskService;
 import com.frederic.taskmanager.view.ConsoleView;
 
+/**
+
+ * Contrôle le traitement des commandes utilisateur et délègue les opérations au service de tâches.
+ */
 public class TaskController {
 
     private static final int MAX_TITLE_LENGTH = 200;
@@ -15,11 +19,25 @@ public class TaskController {
     private final TaskService taskService;
     private final ConsoleView consoleView;
 
+    /**
+
+     * Crée un contrôleur avec le service de tâches et la vue console.
+     *
+     * @param taskService service chargé de gérer les tâches
+     * @param consoleView vue utilisée pour afficher les résultats
+     */
     public TaskController(TaskService taskService, ConsoleView consoleView) {
         this.taskService = taskService;
         this.consoleView = consoleView;
     }
 
+    /**
+
+     * Traite une commande utilisateur.
+     *
+     * @param args commande et ses arguments
+     * @return {@code false} si la commande demande l'arrêt, {@code true} sinon
+     */
     public boolean handleCommand(String[] args) {
         if (args.length == 0) return true;
 
@@ -38,6 +56,12 @@ public class TaskController {
         return true;
     }
 
+    /**
+
+     * Valide et ajoute une nouvelle tâche.
+     *
+     * @param args arguments de la commande {@code add}
+     */
     private void handleAdd(String[] args) {
         if (args.length < 2) {
             consoleView.displayError("Titre manquant. Syntaxe : add \"<titre>\"");
@@ -63,6 +87,13 @@ public class TaskController {
         }
     }
 
+    /**
+
+     * Reconstitue le titre à partir des arguments et retire les guillemets.
+     *
+     * @param args arguments contenant le titre
+     * @return titre reconstitué, ou {@code null} si les guillemets sont invalides
+     */
     private String joinAndUnquote(String[] args) {
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
@@ -81,6 +112,12 @@ public class TaskController {
         return raw.substring(1, raw.length() - 1);
     }
 
+    /**
+
+     * Supprime une tâche à partir de son identifiant.
+     *
+     * @param args arguments de la commande {@code delete}
+     */
     private void handleDelete(String[] args) {
         Integer id = parseId(args, "delete");
         if (id == null) return;
@@ -95,6 +132,12 @@ public class TaskController {
         }
     }
 
+    /**
+
+     * Marque une tâche comme terminée.
+     *
+     * @param args arguments de la commande {@code done}
+     */
     private void handleDone(String[] args) {
         Integer id = parseId(args, "done");
         if (id == null) return;
@@ -119,6 +162,14 @@ public class TaskController {
         }
     }
 
+    /**
+
+     * Valide et convertit un identifiant fourni en argument.
+     *
+     * @param args arguments contenant l'identifiant
+     * @param commandName nom de la commande associée
+     * @return identifiant valide, ou {@code null} si l'argument est invalide
+     */
     private Integer parseId(String[] args, String commandName) {
         if (args.length < 2) {
             consoleView.displayError("Identifiant manquant. Syntaxe : " + commandName + " <id>");

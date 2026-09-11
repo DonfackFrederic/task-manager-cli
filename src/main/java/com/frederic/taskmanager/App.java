@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Scanner;
 
 /**
+
  * Point d'entrée de l'application Gestionnaire de tâches CLI.
  *
  * Chaque exécution traite une seule commande passée en argument
@@ -26,11 +27,13 @@ public class App {
     private static final Path DATA_FILE = Path.of("data", "tasks.json");
 
     /**
+
      * Instancie les couches (repository, vue)
      * et délègue le traitement.
      *
      * @param args arguments de la ligne de commande : la commande suivie
      *             de ses paramètres (ex: {"add", "Réviser le chapitre 3"})
+
      */
     public static void main(String[] args) throws TaskRepositoryException {
         logger.info("Démarrage de l'application");
@@ -41,6 +44,15 @@ public class App {
         run(args, repository, view);
     }
 
+    /**
+
+     * Initialise le service de tâches et lance le mode d'exécution approprié.
+     *
+     * @param args arguments de la commande
+     * @param repository dépôt utilisé pour stocker les tâches
+     * @param view vue utilisée pour les affichages
+     * @throws TaskRepositoryException si l'initialisation du dépôt échoue
+     */
     static void run(
             String[] args,
             TaskRepository repository,
@@ -69,6 +81,14 @@ public class App {
         }
     }
 
+    /**
+
+     * Exécute une commande unique puis termine l'exécution.
+     *
+     * @param args commande et ses arguments
+     * @param taskService service de gestion des tâches
+     * @param view vue utilisée pour les affichages
+     */
     private static void runOneShot(String[] args, TaskService taskService, ConsoleView view) {
         TaskController controller = new TaskController(taskService, view);
         controller.handleCommand(args);
@@ -76,6 +96,15 @@ public class App {
         // sauvegarde déjà elle-même (voir addTask/deleteTask/markAsDone).
     }
 
+    /**
+
+     * Lance l'interface interactive en boucle de commandes.
+     *
+     * @param taskService service de gestion des tâches
+     * @param view vue utilisée pour les affichages
+     * @param fileExisted indique si le fichier de sauvegarde existait
+     * @param corrupted indique si le fichier de sauvegarde est corrompu
+     */
     private static void runRepl(TaskService taskService, ConsoleView view,
                                 boolean fileExisted, boolean corrupted) {
         view.displayWelcomeBanner();
@@ -109,6 +138,13 @@ public class App {
         logger.info("Arrêt de l'application - {} tâche(s) en mémoire", taskService.getTaskCount());
     }
 
+    /**
+
+     * Découpe une ligne de commande en arguments.
+     *
+     * @param line ligne saisie par l'utilisateur
+     * @return arguments obtenus, ou un tableau vide si la ligne est vide
+     */
     static String[] tokenize(String line) {
         if (line == null || line.isBlank()) return new String[0];
         return line.trim().split("\\s+");

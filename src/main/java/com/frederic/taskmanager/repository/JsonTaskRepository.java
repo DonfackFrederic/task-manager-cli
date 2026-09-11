@@ -10,28 +10,36 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 
 /**
- * Implémentation JSON de {@link TaskRepository} (via Gson).
+ * Implémentation de {@link TaskRepository} utilisant un fichier JSON comme stockage.
  *
- * TODO (Sprint 2) :
- *  - Lire/écrire dans un fichier JSON (ex: data/tasks.json)
- *  - Gérer le cas "fichier inexistant" (retourner une liste vide)
- *  - Gérer les erreurs de lecture/écriture
+ * Les tâches sont conservées dans une {@link LinkedHashMap} et sérialisées
+ * à l'aide de Jackson.
  */
 public class JsonTaskRepository implements TaskRepository {
     private final Path filePath;
 
     private final ObjectMapper objectMapper;
 
+    /**
+     * Crée un dépôt utilisant le fichier indiqué pour le stockage des tâches.
+     *
+     * @param filePath chemin du fichier JSON
+     */
     public JsonTaskRepository(Path filePath) {
         this.filePath = filePath;
         objectMapper = JsonMapper.builder().build();
     }
 
 
+    /**
+     * Charge toutes les tâches depuis le fichier JSON.
+     *
+     * @return tâches chargées, ou une collection vide si le fichier n'existe pas ou est vide
+     * @throws TaskRepositoryException si le fichier ne peut pas être lu ou analysé
+     */
     @Override
     public LinkedHashMap<Integer, Task> findAll() throws TaskRepositoryException{
         if (!Files.exists(filePath)) {
@@ -60,6 +68,12 @@ public class JsonTaskRepository implements TaskRepository {
         }
     }
 
+    /**
+     * Sauvegarde toutes les tâches dans le fichier JSON.
+     *
+     * @param tasks tâches à sauvegarder
+     * @throws TaskRepositoryException si l'écriture échoue
+     */
     @Override
     public void saveAll(LinkedHashMap<Integer, Task> tasks) throws TaskRepositoryException {
         try {
@@ -69,6 +83,11 @@ public class JsonTaskRepository implements TaskRepository {
         }
     }
 
+    /**
+     * Vérifie si le fichier de stockage existe.
+     *
+     * @return {@code true} si le fichier existe, {@code false} sinon
+     */
     @Override
     public boolean exists() {
         return Files.exists(filePath);
