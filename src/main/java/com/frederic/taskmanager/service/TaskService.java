@@ -113,4 +113,13 @@ public class TaskService {
     public int getTaskCount() {
         return tasks.size();
     }
+
+    /**
+     * Sauvegarde les tâches actuellement en mémoire.
+     *
+     * @throws TaskRepositoryException si la sauvegarde échoue
+     */
+    public void saveTasks() throws TaskRepositoryException {
+        jsonTaskRepository.saveAll(tasks);
+    }
 }

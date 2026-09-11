@@ -133,7 +133,12 @@ public class App {
         // sauvegarde finale = filet de sécurité (chaque commande a déjà
         // sauvegardé individuellement) ; permet aussi le message d'adieu du doc.
         view.displaySavingInProgress();
-        view.displaySaveSuccessAndGoodbye(taskService.getTaskCount());
+        try {
+            taskService.saveTasks();
+            view.displaySaveSuccessAndGoodbye(taskService.getTaskCount());
+        } catch (TaskRepositoryException e) {
+            view.displaySaveFailure();
+        }
 
         logger.info("Arrêt de l'application - {} tâche(s) en mémoire", taskService.getTaskCount());
     }
