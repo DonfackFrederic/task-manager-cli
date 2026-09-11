@@ -6,6 +6,8 @@ import com.frederic.taskmanager.repository.JsonTaskRepository;
 import com.frederic.taskmanager.repository.TaskRepository;
 import com.frederic.taskmanager.service.TaskService;
 import com.frederic.taskmanager.view.ConsoleView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -19,6 +21,8 @@ import java.util.Scanner;
  */
 public class App {
 
+    private static final Logger logger = LogManager.getLogger(App.class);
+
     private static final Path DATA_FILE = Path.of("data", "tasks.json");
 
     /**
@@ -29,6 +33,8 @@ public class App {
      *             de ses paramètres (ex: {"add", "Réviser le chapitre 3"})
      */
     public static void main(String[] args) throws TaskRepositoryException {
+        logger.info("Démarrage de l'application");
+
         TaskRepository repository = new JsonTaskRepository(DATA_FILE);
         ConsoleView view = new ConsoleView();
 
@@ -48,6 +54,7 @@ public class App {
             taskService = new TaskService(repository);
         } catch (TaskRepositoryException e) {
             corrupted = true;
+            logger.warn("Le fichier de sauvegarde n'a pas pu être chargé. Démarrage avec une liste vide.", e);
             taskService = new TaskService(repository, new LinkedHashMap<>());
         }
 
@@ -98,6 +105,8 @@ public class App {
         // sauvegardé individuellement) ; permet aussi le message d'adieu du doc.
         view.displaySavingInProgress();
         view.displaySaveSuccessAndGoodbye(taskService.getTaskCount());
+
+        logger.info("Arrêt de l'application - {} tâche(s) en mémoire", taskService.getTaskCount());
     }
 
     static String[] tokenize(String line) {
