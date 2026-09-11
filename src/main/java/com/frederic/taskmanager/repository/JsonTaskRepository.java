@@ -2,6 +2,8 @@ package com.frederic.taskmanager.repository;
 
 import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.model.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -20,6 +22,7 @@ import java.util.LinkedHashMap;
  */
 public class JsonTaskRepository implements TaskRepository {
     private final Path filePath;
+    private static final Logger logger = LogManager.getLogger(JsonTaskRepository.class);
 
     private final ObjectMapper objectMapper;
 
@@ -77,8 +80,11 @@ public class JsonTaskRepository implements TaskRepository {
     @Override
     public void saveAll(LinkedHashMap<Integer, Task> tasks) throws TaskRepositoryException {
         try {
+            Files.createDirectories(filePath.getParent());
+
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath.toFile(), tasks);
-        } catch (JacksonException e) {
+        } catch (JacksonException | IOException e) {
+            logger.error("Échec de l'écriture du fichier {}", filePath, e);
             throw new TaskRepositoryException("Unable to write " + filePath, e);
         }
     }
