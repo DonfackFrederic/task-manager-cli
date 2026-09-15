@@ -4,6 +4,7 @@ import com.frederic.taskmanager.controller.TaskController;
 import com.frederic.taskmanager.exception.TaskRepositoryException;
 import com.frederic.taskmanager.repository.JsonTaskRepository;
 import com.frederic.taskmanager.repository.TaskRepository;
+import com.frederic.taskmanager.service.AppPathsService;
 import com.frederic.taskmanager.service.TaskService;
 import com.frederic.taskmanager.view.ConsoleView;
 import org.apache.logging.log4j.LogManager;
@@ -21,10 +22,16 @@ import java.util.Scanner;
  * (ex: java -jar app.jar add "Titre") puis se termine.
  */
 public class App {
+    static {
+        System.setProperty(
+                "taskcli.log.dir",
+                AppPathsService.logDirectory().toString()
+        );
+    }
 
     private static final Logger logger = LogManager.getLogger(App.class);
 
-    private static final Path DATA_FILE = Path.of("data", "tasks.json");
+    private static final Path DATA_FILE = AppPathsService.dataDirectory().resolve("tasks.json");
 
     /**
 

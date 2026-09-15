@@ -5,8 +5,9 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n"/>
         </Console>
 
-        <RollingFile name="RollingFile" fileName="logs/app.log"
-                     filePattern="logs/app-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="RollingFile"
+                     fileName="${sys:taskcli.log.dir}/app.log"
+                     filePattern="${sys:taskcli.log.dir}/app-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
